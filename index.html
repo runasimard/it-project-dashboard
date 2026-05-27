@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IT Project Management Dashboard</title>
+
+<style>
+body {
+  font-family: Figtree, sans-serif;
+  margin: 0;
+  background: #f4f6f8;
+  color: black;
+}
+
+
+header {
+  background: #FBBCC8;
+  padding: 15px 30px;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  height: 70px;
+}
+
+
+.container {
+  padding: 20px;
+}
+
+
+.form-container {
+  background: white;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 10px;
+  max-width: 100%;
+  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+  padding: 8px;
+}
+
+.teams-section {
+  grid-column: span 2;
+}
+
+.teams-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.teams-box label {
+  background: #eee;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.tag {
+  display: inline-block;
+  background: #ddd;
+  padding: 3px 6px;
+  margin: 2px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  margin-top: 20px;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 10px;
+  vertical-align: top;
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.add-btn {
+  background: #FBBCC8;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 15px;
+  width: 100%;
+  font-weight: bold;
+}
+
+th:nth-child(2), td:nth-child(2) { width: 25%; }
+th:nth-child(5), td:nth-child(5) { width: 30%; }
+
+th {
+  background: #FBBCC8;
+}
+
+
+td:last-child {
+  vertical-align: middle;
+  text-align: center;
+}
+
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+}
+
+.delete-btn:hover {
+  transform: scale(1.3);
+}
+
+/* STATUS */
+.status {
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 12px;
+}
+
+.in-progress { background: rgb(17, 75, 95); }
+.completed { background: rgb(69, 105, 144); }
+.backlog { background: rgb(244, 91, 105); }
+.scoping { background: rgb(107, 39, 55); }
+
+</style>
+</head>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<body>
+
+<header>
+  <div class="header-container">
+    <img src="logo.png" class="logo">
+    <h1>IT Project Portfolio Dashboard</h1>
+  </div>
+</header>
+
+<div class="container">
+
+<div style="width:300px; margin: 0 auto 20px auto;">
+  <canvas id="statusChart"></canvas>
+</div>
+
+  <!-- FORM -->
+  <div class="form-container">
+    <h3>Add New Project</h3>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Category</label>
+        <select id="category">
+          <option>Cybersecurity</option>
+          <option>E-Commerce</option>
+          <option>Finance</option>
+          <option>Infrastructure</option>
+          <option>IT Restructure</option>
+          <option>Loss Prevention</option>
+          <option>Marketing</option>
+          <option>Omnichannel</option>
+          <option>Planning & Allocation</option>
+          <option>SLT Objective</option>
+          <option>Warehouse</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Project Name</label>
+        <input id="name">
+      </div>
+
+      <div class="form-group">
+        <label>Quarter</label>
+        <select id="quarter">
+          <option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option><option>TBD</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="priority">
+          <option>1</option><option>2</option><option>3</option>
+        </select>
+      </div>
+
+      <!-- FULL TEAMS -->
+      <div class="form-group teams-section">
+        <label>Teams</label>
+
+        <div class="teams-box">
+          <label><input type="checkbox" value="Accessories"> Accessories</label>
+          <label><input type="checkbox" value="Akeneo"> Akeneo</label>
+          <label><input type="checkbox" value="Allocation"> Allocation</label>
+          <label><input type="checkbox" value="Apparel"> Apparel</label>
+          <label><input type="checkbox" value="Ascend"> Ascend</label>
+          <label><input type="checkbox" value="Centric"> Centric</label>
+          <label><input type="checkbox" value="CS"> CS</label>
+          <label><input type="checkbox" value="Cyberstratego"> Cyberstratego</label>
+          <label><input type="checkbox" value="E-Commerce"> E-Commerce</label>
+          <label><input type="checkbox" value="Finance"> Finance</label>
+          <label><input type="checkbox" value="Footwear"> Footwear</label>
+          <label><input type="checkbox" value="Gorgias"> Gorgias</label>
+          <label><input type="checkbox" value="HR"> HR</label>
+          <label><input type="checkbox" value="Intercam"> Intercam</label>
+          <label><input type="checkbox" value="International"> International</label>
+          <label><input type="checkbox" value="IT"> IT</label>
+          <label><input type="checkbox" value="Law"> Law</label>
+          <label><input type="checkbox" value="Lazer"> Lazer</label>
+          <label><input type="checkbox" value="Logistics"> Logistics</label>
+          <label><input type="checkbox" value="LP"> LP</label>
+          <label><input type="checkbox" value="Marketing"> Marketing</label>
+          <label><input type="checkbox" value="MMO"> MMO</label>
+          <label><input type="checkbox" value="Operations"> Operations</label>
+          <label><input type="checkbox" value="Payroll"> Payroll</label>
+          <label><input type="checkbox" value="Planning"> Planning</label>
+          <label><input type="checkbox" value="SBI"> SBI</label>
+          <label><input type="checkbox" value="Warehouse"> Warehouse</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select id="status">
+          <option>In Progress</option>
+          <option>Scoping</option>
+          <option>Backlog</option>
+          <option>Completed</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- ✅ YOUR BUTTON UNCHANGED -->
+    <button class="add-btn" onclick="addProject()">Add Project</button>
+
+  </div>
+
+  <!-- TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Project</th>
+        <th>Quarter</th>
+        <th>Priority</th>
+        <th>Teams</th>
+        <th>Status</th>
+        <th>🗑</th>
+      </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+  </table>
+
+</div>
+
+<script>
+let projects = JSON.parse(localStorage.getItem("projects")) || [];
+let chart;
+
+function addProject() {
+  const category = document.getElementById("category").value;
+  const name = document.getElementById("name").value;
+  const quarter = document.getElementById("quarter").value;
+  const priority = document.getElementById("priority").value;
+  const status = document.getElementById("status").value;
+
+  const teamsArray = Array.from(
+    document.querySelectorAll(".teams-box input:checked")
+  ).map(el => el.value);
+
+  if (name === "") {
+    alert("Enter project name");
+    return;
+  }
+
+  const project = {
+    category,
+    name,
+    quarter,
+    priority,
+    status,
+    teams: teamsArray
+  };
+
+  projects.push(project);
+  localStorage.setItem("projects", JSON.stringify(projects));
+
+  renderProjects();
+
+  document.getElementById("name").value = "";
+  document.querySelectorAll(".teams-box input").forEach(cb => cb.checked = false);
+}
+
+function renderProjects() {
+  const tableBody = document.getElementById("tableBody");
+  tableBody.innerHTML = "";
+
+  projects.forEach((proj, index) => {
+    const row = document.createElement("tr");
+
+    const tags = proj.teams
+      .map(t => `<span class="tag">${t}</span>`)
+      .join("");
+
+    const statusClass = proj.status.toLowerCase().replace(" ", "-");
+
+    row.innerHTML = `
+      <td>${proj.category}</td>
+      <td>${proj.name}</td>
+      <td>${proj.quarter}</td>
+      <td>${proj.priority}</td>
+      <td>${tags}</td>
+      <td><span class="status ${statusClass}">${proj.status}</span></td>
+      <td><button class="delete-btn" onclick="deleteRow(${index})">🗑️</button></td>
+    `;
+
+    tableBody.appendChild(row);
+  });
+
+  updatePieChart(); //
+}
+
+function deleteRow(index) {
+  projects.splice(index, 1);
+  localStorage.setItem("projects", JSON.stringify(projects));
+  renderProjects();
+}
+
+
+function updatePieChart() {
+  const counts = {
+    "In Progress": 0,
+    "Scoping": 0,
+    "Backlog": 0,
+    "Completed": 0
+  };
+
+  projects.forEach(p => {
+    if (counts[p.status] !== undefined) {
+      counts[p.status]++;
+    }
+  });
+
+  const ctx = document.getElementById("statusChart").getContext("2d");
+
+  if (chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: ["In Progress", "Scoping", "Backlog", "Completed"],
+      datasets: [{
+        data: [
+          counts["In Progress"],
+          counts["Scoping"],
+          counts["Backlog"],
+          counts["Completed"]
+        ],
+        backgroundColor: [
+          "rgb(17, 75, 95)", 
+          "rgb(69, 105, 144)",
+          "rgb(244, 91, 105)",
+          "rgb(107, 39, 55)"
+        ]
+      }]
+    },
+    
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "bottom"
+        }
+      }
+    }
+  });
+}
+
+
+window.onload = function () {
+  renderProjects();
+};
+
+</script>
+
+</body>
+</html>
