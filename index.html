@@ -609,9 +609,21 @@ const project = projects.find(p => p.id === id);
 if (project) {
   project.status = newStatus;
 }
-updatePieChart();
-document.getElementById("totalProjects").innerText = projects.length;
+    
+const statusOrder = {
+  "In Progress": 1,
+  "Scoping": 2,
+  "Backlog": 3,
+  "Completed": 4
+};
 
+projects.sort((a, b) => {
+  const statusA = a.status || "Backlog";
+  const statusB = b.status || "Backlog";
+  return statusOrder[statusA] - statusOrder[statusB];
+});
+
+renderProjects();
     }
   });
 };
