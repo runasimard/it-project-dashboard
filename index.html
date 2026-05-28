@@ -231,6 +231,22 @@ td {
 .status-dropdown.completed { background: rgb(107, 39, 55); }
 
   
+.triangle-btn {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 15px solid #FBBCC8;
+  cursor: pointer;
+  margin: 10px auto;
+  display: block;
+}
+
+.triangle-btn:hover {
+  border-top-color: #e79aaa;
+}
+
+  
 </style>
 </head>
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -247,10 +263,8 @@ td {
 <div class="container">
 
 <div class="top-row">
-
-<button id="sortBtn" class="add-btn" style="max-width:200px;">
-  Sort by Status
-</button>
+  
+<button id="sortBtn" class="triangle-btn" title="Sort by Status"></button>
 
   <div class="stat-box">
     <h3 id="totalProjects">0</h3>
@@ -397,7 +411,8 @@ const db = getFirestore(app);
 
 let projects = [];
 let chart;
-
+let sortAscending = true;
+  
 async function addProject() {
   const btn = document.getElementById("addBtn");
   const category = document.getElementById("category").value;
@@ -432,7 +447,10 @@ if (name === "") {
     teams: teamsArray
   });
 
-  renderProjects();
+  
+await fetchProjects();
+displayProjects();
+
 
   document.getElementById("name").value = "";
   document.querySelectorAll(".teams-box input").forEach(cb => cb.checked = false);
@@ -442,10 +460,8 @@ btn.textContent = "Add Project";
 
 }
 
-async function renderProjects() {
-  const tableBody = document.getElementById("tableBody");
-  tableBody.innerHTML = "";
 
+async function fetchProjects() {
   const snapshot = await getDocs(collection(db, "projects"));
 
   projects = [];
@@ -456,57 +472,58 @@ async function renderProjects() {
       ...docSnap.data()
     });
   });
-projects = projects.filter(p => p !== undefined);
+
+  projects = projects.filter(p => p !== undefined);
+}
+  
+function displayProjects() {
+  const tableBody = document.getElementById("tableBody");
+  tableBody.innerHTML = "";
 
   projects.forEach(proj => {
-  const row = document.createElement("tr");
+    const row = document.createElement("tr");
 
-  
-console.log("Proj data:", proj);
+    const tags = (proj.teams || [])
+      .map(t => `<span class="tag">${t}</span>`)
+      .join("");
 
-const tags = (proj && proj.teams ? proj.teams : []).map(t => `<span class="tag">${t}</span>`).join("");
+    const statusValue = proj.status || "Backlog";
+    const statusClass = statusValue.toLowerCase().replace(" ", "-");
 
-  const statusValue = proj.status || "Backlog";
-const statusClass = statusValue.toLowerCase().replace(" ", "-");
+    row.innerHTML = `
+      <td>${proj.category || ""}</td>
+      <td>${proj.name || ""}</td>
+      <td>${proj.quarter || ""}</td>
+      <td>${proj.priority || ""}</td>
+      <td>${tags}</td>
+      <td>
+        <select class="status-dropdown ${statusClass}" data-id="${proj.id}">
+          <option ${statusValue === "In Progress" ? "selected" : ""}>In Progress</option>
+          <option ${statusValue === "Scoping" ? "selected" : ""}>Scoping</option>
+          <option ${statusValue === "Backlog" ? "selected" : ""}>Backlog</option>
+          <option ${statusValue === "Completed" ? "selected" : ""}>Completed</option>
+        </select>
+      </td>
+    `;
 
+    const btn = document.createElement("button");
+    btn.textContent = "🗑️";
+    btn.className = "delete-btn";
+    btn.onclick = () => deleteRow(proj.id);
 
+    const td = document.createElement("td");
+    td.appendChild(btn);
+    row.appendChild(td);
 
-  
-row.innerHTML = `
-  <td>${proj.category || ""}</td>
-  <td>${proj.name || ""}</td>
-  <td>${proj.quarter || ""}</td>
-  <td>${proj.priority || ""}</td>
-  <td>${tags}</td>
-  
-<td>
-  <select class="status-dropdown ${statusClass}" data-id="${proj.id}">
-    <option ${statusValue === "In Progress" ? "selected" : ""}>In Progress</option>
-    <option ${statusValue === "Scoping" ? "selected" : ""}>Scoping</option>
-    <option ${statusValue === "Backlog" ? "selected" : ""}>Backlog</option>
-    <option ${statusValue === "Completed" ? "selected" : ""}>Completed</option>
-  </select>
-</td>
-
-`;
-
-
-  const btn = document.createElement("button");
-  btn.textContent = "🗑️";
-  btn.className = "delete-btn";
-  btn.onclick = () => deleteRow(proj.id);
-
-  const td = document.createElement("td");
-  td.appendChild(btn);
-  row.appendChild(td);
-
-  tableBody.appendChild(row);
-});
-
+    tableBody.appendChild(row);
+  });
 
   updatePieChart();
   document.getElementById("totalProjects").innerText = projects.length;
 }
+  
+
+
 
 
 async function deleteRow(id) {
@@ -514,7 +531,10 @@ async function deleteRow(id) {
   const scrollPosition = window.scrollY;
 
   await deleteDoc(doc(db, "projects", id));
-  await renderProjects();
+  
+await fetchProjects();
+displayProjects();
+
 
   requestAnimationFrame(() => {
     window.scrollTo(0, scrollPosition);
@@ -574,8 +594,11 @@ function updatePieChart() {
 
 
 
-window.onload = function () {
-  renderProjects();
+window.onload = async function () {
+  
+  await fetchProjects();
+  displayProjects();
+
   document.getElementById("addBtn").addEventListener("click", addProject);
   document.getElementById("sortBtn").addEventListener("click", sortProjects);
 document.getElementById("tableBody").addEventListener("change", async (e) => {
@@ -616,13 +639,18 @@ function sortProjects() {
   };
 
   projects.sort((a, b) => {
-    const statusA = a.status || "Backlog";
-    const statusB = b.status || "Backlog";
-    return statusOrder[statusA] - statusOrder[statusB];
+    const result =
+      statusOrder[a.status || "Backlog"] -
+      statusOrder[b.status || "Backlog"];
+
+    return sortAscending ? result : -result;
   });
 
-  renderProjects();
+  sortAscending = !sortAscending; // ✅ flips order each click
+console.log(projects)
+  displayProjects();
 }
+
 
 
 </script>
