@@ -232,15 +232,23 @@ td {
 
   
 
+
+
 .triangle-btn {
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 10px solid black;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid black;
   cursor: pointer;
   background: none;
 }
+
+
+.triangle-btn.active {
+  transform: translateY(-50%) rotate(180deg);
+}
+
 
 
 .triangle-btn:hover {
