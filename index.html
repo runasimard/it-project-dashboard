@@ -230,27 +230,21 @@ td {
 .status-dropdown.backlog { background: rgb(244, 91, 105); }
 .status-dropdown.completed { background: rgb(107, 39, 55); }
 
-  
-
-
-
 .triangle-btn {
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 8px solid black;
-  cursor: pointer;
   background: none;
+  cursor: pointer;
+  padding: 0;
 }
 
-
-.triangle-btn.active {
-  transform: translateY(-50%) rotate(180deg);
-}
 .triangle-btn:hover {
   opacity: 0.7;
-}  
+}
+
 th {
   position: relative;
 }
@@ -262,7 +256,9 @@ th .triangle-btn {
   transform: translateY(-50%);
 }
 
-
+th .triangle-btn.active {
+  transform: translateY(-50%) rotate(180deg);
+}
   
 </style>
 </head>
