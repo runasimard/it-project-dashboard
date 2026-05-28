@@ -231,20 +231,33 @@ td {
 .status-dropdown.completed { background: rgb(107, 39, 55); }
 
   
+
 .triangle-btn {
   width: 0;
   height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 15px solid #FBBCC8;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid black;
   cursor: pointer;
-  margin: 10px auto;
-  display: block;
+  background: none;
 }
+
 
 .triangle-btn:hover {
   border-top-color: #e79aaa;
 }
+  
+th {
+  position: relative;
+}
+
+th .triangle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 
   
 </style>
@@ -263,8 +276,6 @@ td {
 <div class="container">
 
 <div class="top-row">
-  
-<button id="sortBtn" class="triangle-btn" title="Sort by Status"></button>
 
   <div class="stat-box">
     <h3 id="totalProjects">0</h3>
@@ -379,7 +390,12 @@ td {
         <th>Quarter</th>
         <th>Priority</th>
         <th>Teams</th>
-        <th>Status</th>
+       
+<th>
+  Status
+  <button id="sortBtn" class="triangle-btn" title="Sort by Status"></button>
+</th>
+
         <th>🗑</th>
       </tr>
     </thead>
