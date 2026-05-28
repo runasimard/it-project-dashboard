@@ -385,6 +385,8 @@ function renderProjects() {
     return statusOrder[a.status] - statusOrder[b.status];
   });
 
+  localStorage.setItem("projects", JSON.stringify(projects));
+
   projects.forEach((proj, index) => {
     const row = document.createElement("tr");
 
