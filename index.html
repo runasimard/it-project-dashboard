@@ -309,7 +309,7 @@ td:last-child {
 
     </div>
 
-    <button class="add-btn" onclick="addProject()">Add Project</button>
+    <button class="add-btn" id="addBtn">Add Project</button>
 
   </div>
 
@@ -332,18 +332,37 @@ td:last-child {
 
 </div>
 
-<script>
-let projects = JSON.parse(localStorage.getItem("projects")) || [];
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ✅ Your config
+const firebaseConfig = {
+  apiKey: "AIzaSyAyh16u-4_dt0JdgQbVQCMNpJ03rYqUyGo",
+  authDomain: "project-dashboard-b5c17.firebaseapp.com",
+  projectId: "project-dashboard-b5c17",
+  storageBucket: "project-dashboard-b5c17.firebasestorage.app",
+  messagingSenderId: "1050382335327",
+  appId: "1:1050382335327:web:e109d73ebaea77a90b8aea"
+};
+
+// ✅ Initialize
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let projects = [];
 let chart;
 
-function addProject() {
-   category = document.getElementById("category").value;
-   name = document.getElementById("name").value;
-   quarter = document.getElementById("quarter").value;
-   priority = document.getElementById("priority").value;
-   status = document.getElementById("status").value;
+async function addProject() {
+  const category = document.getElementById("category").value;
+  const name = document.getElementById("name").value;
+  const quarter = document.getElementById("quarter").value;
+  const priority = document.getElementById("priority").value;
+  const status = document.getElementById("status").value;
 
-   teamsArray = Array.from(
+  const teamsArray = Array.from(
     document.querySelectorAll(".teams-box input:checked")
   ).map(el => el.value);
 
@@ -352,18 +371,15 @@ function addProject() {
     return;
   }
 
-  const project = {
-    id: Date.now(),
+  // ✅ SAVE TO FIREBASE
+  await addDoc(collection(db, "projects"), {
     category,
     name,
     quarter,
     priority,
     status,
     teams: teamsArray
-  };
-
-  projects.push(project);
-  localStorage.setItem("projects", JSON.stringify(projects));
+  });
 
   renderProjects();
 
@@ -371,9 +387,20 @@ function addProject() {
   document.querySelectorAll(".teams-box input").forEach(cb => cb.checked = false);
 }
 
-function renderProjects() {
+async function renderProjects() {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = "";
+
+  const snapshot = await getDocs(collection(db, "projects"));
+
+  projects = [];
+
+  snapshot.forEach(docSnap => {
+    projects.push({
+      id: docSnap.id,
+      ...docSnap.data()
+    });
+  });
 
   const statusOrder = {
     "In Progress": 1,
@@ -382,45 +409,44 @@ function renderProjects() {
     "Completed": 4
   };
 
-  projects.sort((a, b) => {
-    return statusOrder[a.status] - statusOrder[b.status];
-  });
+  projects.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
-  localStorage.setItem("projects", JSON.stringify(projects));
+  projects.forEach(proj => {
+  const row = document.createElement("tr");
 
-  projects.forEach((proj, index) => {
-    const row = document.createElement("tr");
+  const tags = proj.teams.map(t => `<span class="tag">${t}</span>`).join("");
+  const statusClass = proj.status.toLowerCase().replace(" ", "-");
 
-    const tags = proj.teams
-      .map(t => `<span class="tag">${t}</span>`)
-      .join("");
+  // ✅ Create normal cells first
+  row.innerHTML = `
+    <td>${proj.category}</td>
+    <td>${proj.name}</td>
+    <td>${proj.quarter}</td>
+    <td>${proj.priority}</td>
+    <td>${tags}</td>
+    <td><span class="status ${statusClass}">${proj.status}</span></td>
+  `;
 
-    const statusClass = proj.status.toLowerCase().replace(" ", "-");
+  // ✅ Create delete button OUTSIDE the string
+  const btn = document.createElement("button");
+  btn.textContent = "🗑️";
+  btn.className = "delete-btn";
+  btn.onclick = () => deleteRow(proj.id);
 
-    row.innerHTML = `
-      <td>${proj.category}</td>
-      <td>${proj.name}</td>
-      <td>${proj.quarter}</td>
-      <td>${proj.priority}</td>
-      <td>${tags}</td>
-      <td><span class="status ${statusClass}">${proj.status}</span></td>
-      <td><button class="delete-btn" onclick="deleteRow(${proj.id})">🗑️</button></td>
-    `;
+  const td = document.createElement("td");
+  td.appendChild(btn);
+  row.appendChild(td);
 
-    tableBody.appendChild(row);
-  });
+  tableBody.appendChild(row);
+});
 
-  
-updatePieChart();
-
-document.getElementById("totalProjects").innerText = projects.length;
- //
+  updatePieChart();
+  document.getElementById("totalProjects").innerText = projects.length;
 }
 
 
-function deleteRow(id) {
-  projects = projects.filter(p => p.id !== id);
-  localStorage.setItem("projects", JSON.stringify(projects));
+async function deleteRow(id) {
+  await deleteDoc(doc(db, "projects", id));
   renderProjects();
 }
 
@@ -475,8 +501,10 @@ function updatePieChart() {
 }
 
 
+
 window.onload = function () {
   renderProjects();
+  document.getElementById("addBtn").addEventListener("click", addProject);
 };
 
 </script>
