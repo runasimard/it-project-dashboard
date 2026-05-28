@@ -248,6 +248,10 @@ td {
 
 <div class="top-row">
 
+<button id="sortBtn" class="add-btn" style="max-width:200px;">
+  Sort by Status
+</button>
+
   <div class="stat-box">
     <h3 id="totalProjects">0</h3>
     <p>Total Projects</p>
@@ -454,21 +458,6 @@ async function renderProjects() {
   });
 projects = projects.filter(p => p !== undefined);
 
-const statusOrder = {
-  "In Progress": 1,
-  "Scoping": 2,
-  "Backlog": 3,
-  "Completed": 4
-};
-
-projects.sort((a, b) => {
-  const statusA = a.status || "Backlog";
-  const statusB = b.status || "Backlog";
-
-  return statusOrder[statusA] - statusOrder[statusB];
-});
-
-
   projects.forEach(proj => {
   const row = document.createElement("tr");
 
@@ -588,45 +577,53 @@ function updatePieChart() {
 window.onload = function () {
   renderProjects();
   document.getElementById("addBtn").addEventListener("click", addProject);
-  
+  document.getElementById("sortBtn").addEventListener("click", sortProjects);
 document.getElementById("tableBody").addEventListener("change", async (e) => {
   if (e.target.classList.contains("status-dropdown")) {
 
     const select = e.target;
 
-    select.className = "status-dropdown " +
-      select.value.toLowerCase().replace(" ", "-");
-
     const id = select.getAttribute("data-id");
     const newStatus = select.value;
 
-   
-await updateDoc(doc(db, "projects", id), {
-  status: newStatus
-});
 
-const project = projects.find(p => p.id === id);
-if (project) {
-  project.status = newStatus;
-}
-    
-const statusOrder = {
-  "In Progress": 1,
-  "Scoping": 2,
-  "Backlog": 3,
-  "Completed": 4
-};
+    select.className =
+      "status-dropdown " + newStatus.toLowerCase().replace(" ", "-");
 
-projects.sort((a, b) => {
-  const statusA = a.status || "Backlog";
-  const statusB = b.status || "Backlog";
-  return statusOrder[statusA] - statusOrder[statusB];
-});
 
-renderProjects();
+    await updateDoc(doc(db, "projects", id), {
+      status: newStatus
+    });
+
+
+    const project = projects.find(p => p.id === id);
+    if (project) {
+      project.status = newStatus;
     }
-  });
+
+    updatePieChart();
+    document.getElementById("totalProjects").innerText = projects.length;
+  }
+});
 };
+function sortProjects() {
+
+  const statusOrder = {
+    "In Progress": 1,
+    "Scoping": 2,
+    "Backlog": 3,
+    "Completed": 4
+  };
+
+  projects.sort((a, b) => {
+    const statusA = a.status || "Backlog";
+    const statusB = b.status || "Backlog";
+    return statusOrder[statusA] - statusOrder[statusB];
+  });
+
+  renderProjects();
+}
+
 
 </script>
 
