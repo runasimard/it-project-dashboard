@@ -589,16 +589,22 @@ window.onload = function () {
   renderProjects();
   document.getElementById("addBtn").addEventListener("click", addProject);
   
- document.getElementById("tableBody").addEventListener("change", async (e) => {
-    if (e.target.classList.contains("status-dropdown")) {
-      const id = e.target.getAttribute("data-id");
-      const newStatus = e.target.value;
+document.getElementById("tableBody").addEventListener("change", async (e) => {
+  if (e.target.classList.contains("status-dropdown")) {
 
-      await updateDoc(doc(db, "projects", id), {
-        status: newStatus
-      });
+    const select = e.target;
 
-      renderProjects();
+    select.className = "status-dropdown " +
+      select.value.toLowerCase().replace(" ", "-");
+
+    const id = select.getAttribute("data-id");
+    const newStatus = select.value;
+
+    await updateDoc(doc(db, "projects", id), {
+      status: newStatus
+    });
+    updatePieChart();
+    document.getElementById("totalProjects").innerText = projects.length;
     }
   });
 };
