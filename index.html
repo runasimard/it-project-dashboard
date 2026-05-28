@@ -640,7 +640,7 @@ document.getElementById("tableBody").addEventListener("change", async (e) => {
 });
 };
 function sortProjects() {
-
+document.getElementById("sortBtn").classList.toggle("active");
   const statusOrder = {
     "In Progress": 1,
     "Scoping": 2,
