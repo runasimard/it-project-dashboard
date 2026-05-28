@@ -337,13 +337,13 @@ let projects = JSON.parse(localStorage.getItem("projects")) || [];
 let chart;
 
 function addProject() {
-  const category = document.getElementById("category").value;
-  const name = document.getElementById("name").value;
-  const quarter = document.getElementById("quarter").value;
-  const priority = document.getElementById("priority").value;
-  const status = document.getElementById("status").value;
+   category = document.getElementById("category").value;
+   name = document.getElementById("name").value;
+   quarter = document.getElementById("quarter").value;
+   priority = document.getElementById("priority").value;
+   status = document.getElementById("status").value;
 
-  const teamsArray = Array.from(
+   teamsArray = Array.from(
     document.querySelectorAll(".teams-box input:checked")
   ).map(el => el.value);
 
@@ -353,6 +353,7 @@ function addProject() {
   }
 
   const project = {
+    id: Date.now(),
     category,
     name,
     quarter,
@@ -403,7 +404,7 @@ function renderProjects() {
       <td>${proj.priority}</td>
       <td>${tags}</td>
       <td><span class="status ${statusClass}">${proj.status}</span></td>
-      <td><button class="delete-btn" onclick="deleteRow(${index})">🗑️</button></td>
+      <td><button class="delete-btn" onclick="deleteRow(${proj.id})">🗑️</button></td>
     `;
 
     tableBody.appendChild(row);
@@ -416,8 +417,9 @@ document.getElementById("totalProjects").innerText = projects.length;
  //
 }
 
-function deleteRow(index) {
-  projects.splice(index, 1);
+
+function deleteRow(id) {
+  projects = projects.filter(p => p.id !== id);
   localStorage.setItem("projects", JSON.stringify(projects));
   renderProjects();
 }
