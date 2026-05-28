@@ -374,6 +374,17 @@ function renderProjects() {
   const tableBody = document.getElementById("tableBody");
   tableBody.innerHTML = "";
 
+  const statusOrder = {
+    "In Progress": 1,
+    "Scoping": 2,
+    "Backlog": 3,
+    "Completed": 4
+  };
+
+  projects.sort((a, b) => {
+    return statusOrder[a.status] - statusOrder[b.status];
+  });
+
   projects.forEach((proj, index) => {
     const row = document.createElement("tr");
 
