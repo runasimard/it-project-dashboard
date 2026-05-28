@@ -399,15 +399,22 @@ async function renderProjects() {
       ...docSnap.data()
     });
   });
+projects = projects.filter(p => p !== undefined);
 
-  const statusOrder = {
-    "In Progress": 1,
-    "Scoping": 2,
-    "Backlog": 3,
-    "Completed": 4
-  };
+const statusOrder = {
+  "In Progress": 1,
+  "Scoping": 2,
+  "Backlog": 3,
+  "Completed": 4
+};
 
-  projects.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+projects.sort((a, b) => {
+  const statusA = a.status || "Backlog";
+  const statusB = b.status || "Backlog";
+
+  return statusOrder[statusA] - statusOrder[statusB];
+});
+
 
   projects.forEach(proj => {
   const row = document.createElement("tr");
