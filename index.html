@@ -600,11 +600,18 @@ document.getElementById("tableBody").addEventListener("change", async (e) => {
     const id = select.getAttribute("data-id");
     const newStatus = select.value;
 
-    await updateDoc(doc(db, "projects", id), {
-      status: newStatus
-    });
-    updatePieChart();
-    document.getElementById("totalProjects").innerText = projects.length;
+   
+await updateDoc(doc(db, "projects", id), {
+  status: newStatus
+});
+
+const project = projects.find(p => p.id === id);
+if (project) {
+  project.status = newStatus;
+}
+updatePieChart();
+document.getElementById("totalProjects").innerText = projects.length;
+
     }
   });
 };
