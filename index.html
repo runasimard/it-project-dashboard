@@ -462,11 +462,13 @@ async function deleteRow(id) {
   const scrollPosition = window.scrollY;
 
   await deleteDoc(doc(db, "projects", id));
-
   await renderProjects();
 
-  window.scrollTo(0, scrollPosition);
+  requestAnimationFrame(() => {
+    window.scrollTo(0, scrollPosition);
+  });
 }
+
 
 
 function updatePieChart() {
