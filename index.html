@@ -417,17 +417,20 @@ console.log("Proj data:", proj);
 
 const tags = (proj && proj.teams ? proj.teams : []).map(t => `<span class="tag">${t}</span>`).join("");
 
-  const statusClass = proj.status.toLowerCase().replace(" ", "-");
+  const statusValue = proj.status || "Backlog";
+const statusClass = statusValue.toLowerCase().replace(" ", "-");
 
 
-  row.innerHTML = `
-    <td>${proj.category}</td>
-    <td>${proj.name}</td>
-    <td>${proj.quarter}</td>
-    <td>${proj.priority}</td>
-    <td>${tags}</td>
-    <td><span class="status ${statusClass}">${proj.status}</span></td>
-  `;
+
+  
+row.innerHTML = `
+  <td>${proj.category || ""}</td>
+  <td>${proj.name || ""}</td>
+  <td>${proj.quarter || ""}</td>
+  <td>${proj.priority || ""}</td>
+  <td>${tags}</td>
+  <td><span class="status ${statusClass}">${statusValue}</span></td>
+`;
 
 
   const btn = document.createElement("button");
