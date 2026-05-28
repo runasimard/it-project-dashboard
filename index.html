@@ -458,8 +458,14 @@ row.innerHTML = `
 
 
 async function deleteRow(id) {
+
+  const scrollPosition = window.scrollY;
+
   await deleteDoc(doc(db, "projects", id));
-  renderProjects();
+
+  await renderProjects();
+
+  window.scrollTo(0, scrollPosition);
 }
 
 
