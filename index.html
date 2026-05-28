@@ -338,7 +338,9 @@ td:last-child {
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAyh16u-4_dt0JdgQbVQCMNpJ03rYqUyGo",
@@ -438,7 +440,16 @@ row.innerHTML = `
   <td>${proj.quarter || ""}</td>
   <td>${proj.priority || ""}</td>
   <td>${tags}</td>
-  <td><span class="status ${statusClass}">${statusValue}</span></td>
+  
+<td>
+  <select class="status-dropdown" data-id="${proj.id}">
+    <option ${statusValue === "In Progress" ? "selected" : ""}>In Progress</option>
+    <option ${statusValue === "Scoping" ? "selected" : ""}>Scoping</option>
+    <option ${statusValue === "Backlog" ? "selected" : ""}>Backlog</option>
+    <option ${statusValue === "Completed" ? "selected" : ""}>Completed</option>
+  </select>
+</td>
+
 `;
 
 
@@ -453,6 +464,25 @@ row.innerHTML = `
 
   tableBody.appendChild(row);
 });
+
+  
+
+
+document.getElementById("tableBody").addEventListener("change", async (e) => {
+  if (e.target.classList.contains("status-dropdown")) {
+    const id = e.target.getAttribute("data-id");
+    const newStatus = e.target.value;
+
+    await updateDoc(doc(db, "projects", id), {
+      status: newStatus
+    });
+
+    renderProjects();
+  }
+});
+
+
+
 
   updatePieChart();
   document.getElementById("totalProjects").innerText = projects.length;
