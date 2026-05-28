@@ -338,7 +338,6 @@ td:last-child {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ✅ Your config
 const firebaseConfig = {
   apiKey: "AIzaSyAyh16u-4_dt0JdgQbVQCMNpJ03rYqUyGo",
   authDomain: "project-dashboard-b5c17.firebaseapp.com",
@@ -348,7 +347,6 @@ const firebaseConfig = {
   appId: "1:1050382335327:web:e109d73ebaea77a90b8aea"
 };
 
-// ✅ Initialize
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -371,7 +369,7 @@ async function addProject() {
     return;
   }
 
-  // ✅ SAVE TO FIREBASE
+
   await addDoc(collection(db, "projects"), {
     category,
     name,
@@ -417,7 +415,7 @@ async function renderProjects() {
   const tags = proj.teams.map(t => `<span class="tag">${t}</span>`).join("");
   const statusClass = proj.status.toLowerCase().replace(" ", "-");
 
-  // ✅ Create normal cells first
+
   row.innerHTML = `
     <td>${proj.category}</td>
     <td>${proj.name}</td>
@@ -427,7 +425,7 @@ async function renderProjects() {
     <td><span class="status ${statusClass}">${proj.status}</span></td>
   `;
 
-  // ✅ Create delete button OUTSIDE the string
+
   const btn = document.createElement("button");
   btn.textContent = "🗑️";
   btn.className = "delete-btn";
