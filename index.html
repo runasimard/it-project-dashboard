@@ -144,12 +144,6 @@ td:last-child {
   transform: scale(1.3);
 }
 
-.status {
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: white;
-  font-size: 12px;
-}
 
 .in-progress { background: rgb(17, 75, 95); }
 .completed { background: rgb(107, 39, 55); }
@@ -194,6 +188,49 @@ td:last-child {
   width: 250px;
   height: 250px;
 }
+  
+table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+tr:hover {
+  background: #f1f1f1;
+}
+
+td {
+  padding: 12px;
+}
+
+
+.add-btn {
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+}
+
+.status-dropdown {
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.status-dropdown.in-progress { background: rgb(17, 75, 95); }
+.status-dropdown.scoping { background: rgb(69, 105, 144); }
+.status-dropdown.backlog { background: rgb(244, 91, 105); }
+.status-dropdown.completed { background: rgb(107, 39, 55); }
+
+  
 </style>
 </head>
  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -358,20 +395,28 @@ let projects = [];
 let chart;
 
 async function addProject() {
+  const btn = document.getElementById("addBtn");
   const category = document.getElementById("category").value;
+  
+btn.disabled = true;
+  btn.textContent = "Adding...";
+
   const name = document.getElementById("name").value;
   const quarter = document.getElementById("quarter").value;
   const priority = document.getElementById("priority").value;
   const status = document.getElementById("status").value;
-console.log("Adding project...");
   const teamsArray = Array.from(
     document.querySelectorAll(".teams-box input:checked")
   ).map(el => el.value);
 
-  if (name === "") {
-    alert("Enter project name");
-    return;
-  }
+  
+if (name === "") {
+  alert("Enter project name");
+  btn.disabled = false;      
+  btn.textContent = "Add Project";
+  return;
+}
+
 
 
   await addDoc(collection(db, "projects"), {
@@ -387,6 +432,10 @@ console.log("Adding project...");
 
   document.getElementById("name").value = "";
   document.querySelectorAll(".teams-box input").forEach(cb => cb.checked = false);
+
+btn.disabled = false;
+btn.textContent = "Add Project";
+
 }
 
 async function renderProjects() {
@@ -442,7 +491,7 @@ row.innerHTML = `
   <td>${tags}</td>
   
 <td>
-  <select class="status-dropdown" data-id="${proj.id}">
+  <select class="status-dropdown ${statusClass}" data-id="${proj.id}">
     <option ${statusValue === "In Progress" ? "selected" : ""}>In Progress</option>
     <option ${statusValue === "Scoping" ? "selected" : ""}>Scoping</option>
     <option ${statusValue === "Backlog" ? "selected" : ""}>Backlog</option>
@@ -464,24 +513,6 @@ row.innerHTML = `
 
   tableBody.appendChild(row);
 });
-
-  
-
-
-document.getElementById("tableBody").addEventListener("change", async (e) => {
-  if (e.target.classList.contains("status-dropdown")) {
-    const id = e.target.getAttribute("data-id");
-    const newStatus = e.target.value;
-
-    await updateDoc(doc(db, "projects", id), {
-      status: newStatus
-    });
-
-    renderProjects();
-  }
-});
-
-
 
 
   updatePieChart();
@@ -557,6 +588,21 @@ function updatePieChart() {
 window.onload = function () {
   renderProjects();
   document.getElementById("addBtn").addEventListener("click", addProject);
+  
+ document.getElementById("tableBody").addEventListener("change", async (e) => {
+    if (e.target.classList.contains("status-dropdown")) {
+      const id = e.target.getAttribute("data-id");
+      const newStatus = e.target.value;
+
+      await updateDoc(doc(db, "projects", id), {
+        status: newStatus
+      });
+
+      renderProjects();
+    }
+  });
+};
+
 };
 
 </script>
