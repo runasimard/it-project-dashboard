@@ -359,7 +359,7 @@ async function addProject() {
   const quarter = document.getElementById("quarter").value;
   const priority = document.getElementById("priority").value;
   const status = document.getElementById("status").value;
-
+console.log("Adding project...");
   const teamsArray = Array.from(
     document.querySelectorAll(".teams-box input:checked")
   ).map(el => el.value);
