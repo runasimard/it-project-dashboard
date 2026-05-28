@@ -412,7 +412,11 @@ async function renderProjects() {
   projects.forEach(proj => {
   const row = document.createElement("tr");
 
-  const tags = (proj.teams || []).map(t => `<span class="tag">${t}</span>`).join("");
+  
+console.log("Proj data:", proj);
+
+const tags = (proj && proj.teams ? proj.teams : []).map(t => `<span class="tag">${t}</span>`).join("");
+
   const statusClass = proj.status.toLowerCase().replace(" ", "-");
 
 
