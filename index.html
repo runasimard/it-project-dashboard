@@ -607,7 +607,15 @@ function updatePieChart() {
 
 window.onload = async function () {
   
+ const savedSort = localStorage.getItem("sortAscending");
+  if (savedSort !== null) {
+    sortAscending = savedSort === "true";
+  }
+
   await fetchProjects();
+  
+  sortProjects();
+
   displayProjects();
 
   document.getElementById("addBtn").addEventListener("click", addProject);
@@ -641,7 +649,8 @@ document.getElementById("tableBody").addEventListener("change", async (e) => {
 });
 };
 function sortProjects() {
-document.getElementById("sortBtn").classList.toggle("active");
+  document.getElementById("sortBtn").classList.toggle("active");
+
   const statusOrder = {
     "In Progress": 1,
     "Scoping": 2,
@@ -657,10 +666,14 @@ document.getElementById("sortBtn").classList.toggle("active");
     return sortAscending ? result : -result;
   });
 
-  sortAscending = !sortAscending; // ✅ flips order each click
-console.log(projects)
+
+  localStorage.setItem("sortAscending", sortAscending);
+
+  sortAscending = !sortAscending;
+
   displayProjects();
 }
+`
 
 
 
