@@ -472,6 +472,23 @@ btn.textContent = "Add Project";
 }
 
 
+function applySorting() {
+  const statusOrder = {
+    "In Progress": 1,
+    "Scoping": 2,
+    "Backlog": 3,
+    "Completed": 4
+  };
+
+  projects.sort((a, b) => {
+    const result =
+      statusOrder[a.status || "Backlog"] -
+      statusOrder[b.status || "Backlog"];
+
+    return sortAscending ? result : -result;
+  });
+}
+
 async function fetchProjects() {
   const snapshot = await getDocs(collection(db, "projects"));
 
@@ -605,66 +622,72 @@ function updatePieChart() {
 
 
 
+
 window.onload = async function () {
-  
- const savedSort = localStorage.getItem("sortAscending");
+
+  const savedSort = localStorage.getItem("sortAscending");
   if (savedSort !== null) {
     sortAscending = savedSort === "true";
   }
 
   await fetchProjects();
-  
-  sortProjects();
+
+  // ✅ Apply sort WITHOUT flipping
+  applySorting();
 
   displayProjects();
 
+  // ✅ Set arrow direction correctly
+  if (!sortAscending) {
+    document.getElementById("sortBtn").classList.add("active");
+  }
+
   document.getElementById("addBtn").addEventListener("click", addProject);
   document.getElementById("sortBtn").addEventListener("click", sortProjects);
-document.getElementById("tableBody").addEventListener("change", async (e) => {
-  if (e.target.classList.contains("status-dropdown")) {
 
-    const select = e.target;
+  document.getElementById("tableBody").addEventListener("change", async (e) => {
+    if (e.target.classList.contains("status-dropdown")) {
 
-    const id = select.getAttribute("data-id");
-    const newStatus = select.value;
+      const select = e.target;
+      const id = select.getAttribute("data-id");
+      const newStatus = select.value;
 
+      select.className =
+        "status-dropdown " + newStatus.toLowerCase().replace(" ", "-");
 
-    select.className =
-      "status-dropdown " + newStatus.toLowerCase().replace(" ", "-");
+      await updateDoc(doc(db, "projects", id), {
+        status: newStatus
+      });
 
+      const project = projects.find(p => p.id === id);
+      if (project) {
+        project.status = newStatus;
+      }
 
-    await updateDoc(doc(db, "projects", id), {
-      status: newStatus
-    });
+      // ✅ re-apply sort after change
+      applySorting();
 
-
-    const project = projects.find(p => p.id === id);
-    if (project) {
-      project.status = newStatus;
+      displayProjects();
     }
-
-    updatePieChart();
-    document.getElementById("totalProjects").innerText = projects.length;
-  }
-});
-};
-function sortProjects() {
-  document.getElementById("sortBtn").classList.toggle("active");
-
-  const statusOrder = {
-    "In Progress": 1,
-    "Scoping": 2,
-    "Backlog": 3,
-    "Completed": 4
-  };
-
-  projects.sort((a, b) => {
-    const result =
-      statusOrder[a.status || "Backlog"] -
-      statusOrder[b.status || "Backlog"];
-
-    return sortAscending ? result : -result;
   });
+};
+
+function sortProjects() {
+  // ✅ Flip direction first
+  sortAscending = !sortAscending;
+
+  // ✅ Save preference
+  localStorage.setItem("sortAscending", sortAscending);
+
+  // ✅ Apply sort
+  applySorting();
+
+  // ✅ Update arrow UI
+  document.getElementById("sortBtn").classList.toggle("active", !sortAscending);
+
+  displayProjects();
+}
+`
 
 
   localStorage.setItem("sortAscending", sortAscending);
