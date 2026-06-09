@@ -33,7 +33,8 @@ header {
   padding: 20px;
 }
 
-
+/*FORM SECTION*/
+  
 .form-container {
   background: white;
   padding: 20px;
@@ -64,6 +65,8 @@ header {
   padding: 8px;
 }
 
+/*TEAMS*/
+  
 .teams-section {
   grid-column: span 2;
 }
@@ -90,7 +93,9 @@ header {
   border-radius: 4px;
   font-size: 11px;
 }
-
+  
+/*TABLE*/
+/*FOR FUTURE, I WANT TO ADD A WAY TO GET THE TABLE EXPORTABLE*/ 
 table {
   width: 100%;
   border-collapse: collapse;
@@ -144,7 +149,8 @@ td:last-child {
   transform: scale(1.3);
 }
 
-
+/*DASHBOARD SECTION*/
+  
 .in-progress { background: rgb(17, 75, 95); }
 .completed { background: rgb(107, 39, 55); }
 .backlog { background: rgb(244, 91, 105); }
@@ -285,7 +291,9 @@ th .triangle-btn.active {
 
   <div class="form-container">
     <div class="form-grid">
-
+      
+<!--We can add more categories here when Olivia needs-->
+      
       <div class="form-group">
         <label>Category</label>
         <select id="category">
@@ -323,7 +331,7 @@ th .triangle-btn.active {
         </select>
       </div>
 
-  
+<!--We can add more teams here when Olivia needs-->  
       <div class="form-group teams-section">
         <label>Teams</label>
 
@@ -401,6 +409,7 @@ th .triangle-btn.active {
 
 <script type="module">
 
+//Fire base info
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
